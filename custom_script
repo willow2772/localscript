@@ -1,0 +1,101 @@
+#!/usr/bin/zsh
+# 
+# This is the custom script created by me (potatohead)
+# To make the world better
+# 
+# Dont forget to add "source [custom-script]" folder at your rc config
+# example:
+# put this script to /opt/localscript/
+# if you use bash, add "source /opt/localscript/custom_script" to .bashrc
+# if you use zsh, add "source /opt/localscript/custom_script" to .zshrc
+#
+# custom_script v.1.0
+#   - add godir function (07/06/2020)
+# custom_script v.1.1
+#   - add govpn function (08/06/2020)
+#   - add whereami function (08/06/2020)
+# custom_script v.1.2
+#   - add nmap-automator fullscan @godir (08/06/2020)
+
+function godir() {
+    ## This function will go to the hackthebox directory
+    ## if theres no directory similar to argument given,
+    ## this function will make one
+
+
+    # check if theres an argument given
+    if [[ $# -eq 1 ]]; then   
+        root_dir="/root/Documents/hackthebox/box/"
+        folder_name=$(ls $root_dir | grep $1)
+        #check if it's directory
+        if [[ $folder_name ]] ; then
+            cd $root_dir$folder_name
+        else
+            # if theres no folder with similar name
+            # then make one, easy
+            echo "There is no folder named "$1
+            read "input?Do you wanna make the folder?(y/N) "
+            if [[ $input == "y" ]]; then
+                read "ip?Enter the IP: "
+                # modify / change IP to 3 digits
+                if [[ ${#ip} == 1 ]]; then
+                    chg_ip='00'$ip
+                elif [[ ${#ip} == 2 ]]; then
+                    chg_ip='0'$ip
+                elif [[ ${#ip} == 3 ]]; then
+                    chg_ip=$ip
+                fi
+                full_ip="10.10.10."$ip
+                mkdir $root_dir$chg_ip-$1
+                cd $root_dir$chg_ip-$1
+                # nmap-automator fullscan
+                read "scan?Do you wanna run nmap fullTCPscan as well?(y/N) "
+                if [[ $scan == "y" ]]; then
+                    nmap-automator $full_ip stagedtcp
+                fi
+            fi
+        fi
+    else
+        echo "Usage: godir [box name]"
+    fi
+}
+
+function govpn() {
+    ##  This function will automaticaly connect to vpn
+    ##  either its from htb or boleh vpn
+
+    # check if theres an argument given
+    if [[ $# -eq 1 ]]; then
+        # check the argument
+        if [[ $1 == "htb" ]]; then
+            cd /root/Documents/hackthebox/vpn/
+            openvpn potatohead.ovpn
+        elif [[ $1 == "boleh" ]]; then
+            boleh_vpn="/root/vpn/boleh/"
+            cd $boleh_vpn
+            ls
+            echo ""
+            read "server?Which server do you want to connect? "
+            if [[ -z $server ]]; then
+                :
+            else
+                boleh_server=$(ls|grep $server)
+                openvpn $boleh_server
+            fi
+        fi
+    else
+        echo "Usage: govpn {orgs}"
+    fi
+}
+
+function whereami() {
+    ## This function will find our current geolocation based on country
+    ## Dependencies:
+    ## apt-get install geoip-bin geoip-database
+    
+    # get public ip
+    pub_ip=$(curl https://ipinfo.io/ip 2>/dev/null)
+    # use geoiplookup to find my location (country)
+    geoiplookup $pub_ip
+}
+
