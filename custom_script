@@ -85,6 +85,9 @@ function govpn() {
         fi
     else
         echo "Usage: govpn {orgs}"
+        echo " example:"
+        echo "  govpn htb"
+        echo "  govpn boleh"
     fi
 }
 
