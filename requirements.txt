@@ -1,0 +1,3 @@
+# install geoiplookup
+apt-get install geoip-bin geoip-database
+
