@@ -16,6 +16,9 @@
 #   - add whereami function (08/06/2020)
 # custom_script v.1.2
 #   - add nmap-automator fullscan @godir (08/06/2020)
+# custom_script v.1.3
+#   - add govpn tryhackme (25/06/2020)
+#   - add vpnip function (25/06/2020)
 
 function godir() {
     ## This function will go to the hackthebox directory
@@ -67,9 +70,11 @@ function govpn() {
     # check if theres an argument given
     if [[ $# -eq 1 ]]; then
         # check the argument
+        # htb vpn
         if [[ $1 == "htb" ]]; then
             cd /root/Documents/hackthebox/vpn/
             openvpn potatohead.ovpn
+        # boleh vpn
         elif [[ $1 == "boleh" ]]; then
             boleh_vpn="/root/vpn/boleh/"
             cd $boleh_vpn
@@ -82,9 +87,17 @@ function govpn() {
                 boleh_server=$(ls|grep $server)
                 openvpn $boleh_server
             fi
+        # tryhackme vpn
+        elif [[ $1 == "thm" ]]; then
+            tryhackme="/root/Documents/tryhackme/vpn/"
+            cd $tryhackme
+            openvpn potatohead.ovpn
         fi
     else
         echo "Usage: govpn {orgs}"
+        echo "orgs: htb (hackthebox)"
+        echo "      boleh (bolehvpn)"
+        echo "      thm (tryhackme) "
     fi
 }
 
@@ -99,3 +112,12 @@ function whereami() {
     geoiplookup $pub_ip
 }
 
+function vpnip(){
+    ## This function will show our IP from the vpn
+    vpn_priv_ip=$(ifconfig tun0 | awk '/inet /{print $2}') 2>/dev/null
+    if [[ -z $vpn_priv_ip ]]; then
+        echo "Not Connected to VPN"
+    else
+        echo "VPN Priv IP: "$vpn_priv_ip
+    fi
+}
