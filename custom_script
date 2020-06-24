@@ -98,6 +98,9 @@ function govpn() {
         echo "orgs: htb (hackthebox)"
         echo "      boleh (bolehvpn)"
         echo "      thm (tryhackme) "
+        echo " example:"
+        echo "  govpn htb"
+        echo "  govpn boleh"
     fi
 }
 
